@@ -1,7 +1,7 @@
 <?php
 
 	// Include the external files
-	include 'config.php';
+	include '.config.php';
 
 
 
