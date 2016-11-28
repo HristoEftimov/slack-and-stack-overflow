@@ -48,11 +48,17 @@
 
 		$type = 'none';
 
-		// Parse the arguments from the URL and get the request type
+		// Parse the arguments from the cron job request
 		if (isset($_SERVER['argv']) )
 		{
 			parse_str($_SERVER['argv'][0], $args);
 			$type = $args['type'];
+		}
+
+		// Parse the arguments from the slack slash command
+		if (isset($_POST['text']) )
+		{
+			$type = $_POST['text'];
 		}
 
 		return $type;
