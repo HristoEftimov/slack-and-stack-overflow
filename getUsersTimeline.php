@@ -39,31 +39,37 @@
 			// Get the activities after the last cron job
 			if ($diffMinutes <= $config['cronJobInterval']) {
 			// if (true) {
-				switch ($value->timeline_type) {
-					case 'accepted':
-						$message = $userDisplayName . ' accepted an answer <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'asked':
-						$message = $userDisplayName . ' asked a question <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'answered':
-						$message = $userDisplayName . ' ' . $value->timeline_type . ' on post <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'suggested':
-						$message = $userDisplayName . ' ' . $value->timeline_type . ' an edit on <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'commented':
-						$message = $userDisplayName . ' ' . $value->timeline_type . ' on <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'badge':
-						$message = $userDisplayName . ' earned a new badge: '. $value->detail .'. Congrats buddy :slightly_smiling_face:';
-						break;
-					case 'reviewed':
-						$message = $userDisplayName . ' reviewed a suggested edit <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
-					case 'revision':
-						$message = $userDisplayName . ' edited a post <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
-						break;
+
+				// List the timeline type if it is set as true
+				if ($config['timeline']['type'][$value->timeline_type]) {
+
+					// Show the correct message by the timeline type
+					switch ($value->timeline_type) {
+						case 'accepted':
+							$message = $userDisplayName . ' accepted an answer <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'asked':
+							$message = $userDisplayName . ' asked a question <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'answered':
+							$message = $userDisplayName . ' ' . $value->timeline_type . ' on post <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'suggested':
+							$message = $userDisplayName . ' ' . $value->timeline_type . ' an edit on <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'commented':
+							$message = $userDisplayName . ' ' . $value->timeline_type . ' on <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'badge':
+							$message = $userDisplayName . ' earned a new badge: '. $value->detail .'. Congrats buddy :slightly_smiling_face:';
+							break;
+						case 'reviewed':
+							$message = $userDisplayName . ' reviewed a suggested edit <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+						case 'revision':
+							$message = $userDisplayName . ' edited a post <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
+							break;
+					}
 				}
 
 				// Post the slack message
