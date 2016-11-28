@@ -3,29 +3,103 @@
 	// Include the external files
 	include 'functions.php';
 
-	// Get the users reputations
-	$stack_url = 'https://api.stackexchange.com/2.2/users/'. $users_ids_string .'/?site=stackoverflow&filter=!40D.p(1f74CtdIRr7';
-	$string  = curl_init($stack_url);
-	curl_setopt($string, CURLOPT_ENCODING, 'gzip');  // Required by API
-	curl_setopt($string, CURLOPT_RETURNTRANSFER, 1 );
+	// Check the request type argument
+	$request_type = getRequestType();
 
-	// Result object
-	$json = curl_exec($string );
-	$result = json_decode($json);
+	// Get the API filter property
+	$filter = getAPIFilterProperty($request_type);
 
-	// Close the cURL
-	curl_close($string);
+	// Build the URL to stack overflow API
+	$stack_url = 'https://api.stackexchange.com/2.2/users/'. $users_ids_string .'/?site=stackoverflow&filter='. $filter;
+
+	// Execute cURL: get the users reputations
+	$result = cURLExecute($stack_url);
 
 	// Loop the reputations
 	if (sizeof($result->items) > 0) {
 
 		$message = ':star: Reputation Standing :star:';
+		$team_reputation = 0;
 
-		// List all users and their reputation
+		// Loop all users and their reputation
 		foreach ($result->items as $value) {
-			$message .= "\n". '*'. $value->reputation .' reputation* - ' . getUserDisplayName($value->user_id);
+
+			// Build the message for a user
+			$message .= getUserReputationMsgByRequestType($value, $request_type);
+
+			// Count the team reputation
+			$team_reputation += $value->reputation;
 		}
+
+		// Add the team reputation to the message
+		$message .= "\n\n". "*Team Reputation:* " . $team_reputation;
 
 		// Post the slack message
 		postSlackMessage($message);
+	}
+
+
+	/**
+	 * Returns the request type
+	 * It can be: weekly, monthly or none
+	 * @return string
+	 */
+	function getRequestType() {
+
+		$type = 'none';
+
+		// Parse the arguments from the URL and get the request type
+		if (isset($_SERVER['argv']) )
+		{
+			parse_str($_SERVER['argv'][0], $args);
+			$type = $args['type'];
+		}
+
+		return $type;
+	}
+
+
+	/**
+	 * Returns the filter property for the API call
+	 * @param request type
+	 * @return string
+	 */
+	function getAPIFilterProperty($request_type) {
+		switch ($request_type) {
+			case 'weekly':
+				$filter = '!75UlFOtr1xxIs93ToJi4jwA';
+				break;
+			case 'monthly':
+				$filter = '!75U7pa*xrjkt0Qjet3ghrRA';
+				break;
+			case 'none':
+				$filter = '!qGQfps)LArTmA5VyL1jE';
+				break;
+		}
+
+		return $filter;
+	}
+
+	/**
+	 * Returns the filter property for the API call
+	 * @param request type
+	 * @return string
+	 */
+	function getUserReputationMsgByRequestType($value, $request_type) {
+
+		// Basic message
+		$message = "\n". '*' .$value->reputation. ' reputation* - '. getUserDisplayName($value->user_id). ' ';
+
+		switch ($request_type) {
+			case 'weekly':
+				$message .= '_('. $value->reputation_change_week .' this week )_';
+				break;
+			case 'monthly':
+				$message .= '_('. $value->reputation_change_month .' this month )_';
+				break;
+			case 'none':
+				break;
+		}
+
+		return $message;
 	}
