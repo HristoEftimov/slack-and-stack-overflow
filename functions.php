@@ -33,6 +33,26 @@
 	}
 
 	/**
+	 * Execute a cURL request
+	 * @param $url
+	 * @return object
+	 */
+	function cURLExecute($url) {
+		$string  = curl_init($url);
+		curl_setopt($string, CURLOPT_ENCODING, 'gzip');  // Required by API
+		curl_setopt($string, CURLOPT_RETURNTRANSFER, 1 );
+
+		// Result object
+		$json = curl_exec($string);
+		$result = json_decode($json);
+
+		// Close the cURL
+		curl_close($string);
+
+		return $result;
+	}
+
+	/**
 	 * Send a slack message
 	 * @param $message
 	 */
