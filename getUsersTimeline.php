@@ -2,6 +2,7 @@
 
 	// Include the external files
 	include 'functions.php';
+	include 'badge.php';
 
 	// Set time zone about
 	// Necessary about datetime functions
@@ -61,7 +62,7 @@
 							$message = $userDisplayName . ' ' . $value->timeline_type . ' on <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
 							break;
 						case 'badge':
-							$message = $userDisplayName . ' earned a new badge: '. $value->detail .'. Congrats buddy :slightly_smiling_face:';
+							$message = getBadgeDetailsMessage($value->badge_id, $userDisplayName);
 							break;
 						case 'reviewed':
 							$message = $userDisplayName . ' reviewed a suggested edit <http://stackoverflow.com/questions/'. $value->post_id .'|'. $value->title .'>';
